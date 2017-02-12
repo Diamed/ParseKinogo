@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text.RegularExpressions;
+using System.Linq;
+using System.Data;
 
 namespace ParseKinogo
 {
@@ -38,6 +40,22 @@ namespace ParseKinogo
 
 			films.ForEach(f => AddToDatabase(f));
 			Console.WriteLine($"В базу занесена страница {_page}");
+		}
+
+		public static IEnumerable<Film> GetAll()
+		{
+			var dt = new Database().GetRowsUsingProcedure("Films.GetAll");
+			List<Film> result = new List<Film>();
+
+			foreach(DataRow row in dt.Rows)
+			{
+				result.Add
+				(
+					new Film((int)row["Id"], row["Name"].ToString(), row["URL"].ToString(), row["Year"].ToString())
+				);
+			}
+
+			return result;
 		}
 
 		private static Film GetFilmFromString(string text)

@@ -48,8 +48,10 @@ namespace ParseKinogo
 
 				return reg.Matches(responseBodyAsText).Cast<Match>().Select(m => m.Value).ToList();
 			}
-			catch
+			catch (Exception ex)
 			{
+				Console.WriteLine(ex.Message);
+
 				return null;
 			}
 		}

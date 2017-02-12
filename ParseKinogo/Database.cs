@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 
 namespace ParseKinogo
@@ -12,7 +13,7 @@ namespace ParseKinogo
 		{
 			SqlCommand cmd = new SqlCommand(procedureName, _connection)
 			{
-				CommandType = System.Data.CommandType.StoredProcedure,
+				CommandType = CommandType.StoredProcedure,
 			};
 
 			parameters?.ForEach(p => cmd.Parameters.Add(p));
@@ -27,6 +28,34 @@ namespace ParseKinogo
 
 			}
 			CloseConnection();
+		}
+
+		public DataTable GetRowsUsingProcedure(string procedureName, List<SqlParameter> parameters = null)
+		{
+			using (SqlDataAdapter dataAdapter = new SqlDataAdapter(procedureName, _connection))
+			{
+				dataAdapter.SelectCommand.CommandType = CommandType.StoredProcedure;
+
+				parameters?.ForEach(p => dataAdapter.SelectCommand.Parameters.Add(p));
+
+				using (DataTable dt = new DataTable())
+				{
+					OpenConnection();
+					try
+					{
+						dataAdapter.Fill(dt);
+
+						return dt;
+					}
+					catch
+					{
+
+					}
+					CloseConnection();
+				}
+			}
+
+			return new DataTable();
 		}
 
 		private void OpenConnection()
